@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# Copyright (C) 2012 Freescale Semiconductor, Inc.
+# All rights reserved.
+#
+# This software may be distributed under the terms of the
+# GNU General Public License ("GPL") as published by the Free Software
+# Foundation, either version 2 of that License or (at your option) any
+# later version.
+#
+# THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor ``AS IS'' AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+# expecting $1 to be the path to the qoriq-commmon source root
+ 
+names=`grep _MASK $1/*.h | grep define | cut -d' ' -f2 | cut -f1`
+
+echo "/* Generated code - DO NOT EDIT */"
+
+echo "int shift(unsigned int val)"
+echo {
+echo "	int i;"
+echo "	int v = val;"
+echo "	for (i = 0; i < 32; i++ ) {"
+echo "		if (v & 1)"
+echo "			break;"
+echo "		v >>= 1;"
+echo "	}"
+echo "	return i;"
+echo }
+echo
+echo "void run_testmasks()"
+echo {
+
+for name in $names;
+do
+	basename=`echo $name | sed s/MASK$//`
+	if [ "$basename" != "$name" ]; then
+		echo "	assert(shift(${basename}MASK) == ${basename}SHIFT);"
+	fi
+done
+
+echo 
+echo "	printf(\"qoriq-common mask tests complete\\n\");"
+echo }

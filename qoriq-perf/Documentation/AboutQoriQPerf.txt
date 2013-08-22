@@ -1,0 +1,100 @@
+********************************************************************************
+*******************************
+Supported Processors
+*******************************
+
+qoriq-perf is supported for the following processors:
+		* P5020
+		* P4080
+		* B4860 rev. 1 (untested support for Rev. 2)
+
+Other variants of above listed processors may be supported, but they are 
+untested. In addition, other e500mc or e5500 based processors may be supported,
+but they are untested.
+
+*******************************
+Supported Events
+*******************************
+
+A list of event IDs, each with a short description can be found the qoriq-perf
+distribution in the file PerfEventList.pdf. Note that not all events are 
+supported by all processors.
+
+*******************************
+Utilities
+*******************************
+
+The Utils folder contains utilities that are sometimes useful when using 
+qoriq-perf. We provide a description of the available utilities here.
+
+
+* id_generator. This folder contains python scripts that can be used to
+generate perf IDs for DDR source filtered events (for example, DDR1 or DDR2 hits
+coming from FMAN, SEC, etc.).
+
+To generate a single ID, usage is as follows: 
+
+ $ ddrc_id.py ddrCntlr hitOrMiss sourceID sourceIDMask enableFilter
+
+
+Source-filtered DDR events require the following 5 elements in order to generate
+a perf ID:
+
+	*DDR Controller number. This is an integer >= 1 that specifies the DDR
+Controller of interest.
+
+	*Hit or Miss. This string specifies whether Hits or Misses are of
+interest; ["Hit" | "Miss" ]
+
+	*Source ID identifier. This is the source ID of the DDR hits or misses. 
+These IDs can be found in the respective processor reference manuals.  In 
+addition, several of the IDs used for P5020 can be seen in the display_ids.py 
+python script. This value is an integer in hex format (i.e., with a 0x prefix).
+
+	*Source ID Mask. This mask is applied to both the ID's of incoming 
+events as well as the specified Source ID identifier to "care" the specified
+bits. Events that meet the following condition would be counted:
+
+	(Source ID identifier) & (Source ID Mask) ==
+					(incoming Event ID) & (Source ID Mask)
+
+This value is specified as an integer in hex format (i.e., with a 0x prefix)
+
+	*Enable Filter. This value specifies whether or not the source 
+filtering is applied or not. "1" should be specified to apply filter, and "0"
+to disable filtering.
+
+Also available is the python script called "display_ids.py" which displays a
+list of IDs from known sources (at the time of writing of this document) and
+DDR controllers. A mask of 0xFF is assumed. This script can be modified as
+needed.
+
+*******************************
+Known Limitations
+*******************************
+
+qoriq-perf adds support for off-core, SOC events/counters. Standard perf was
+designed to support standard on-core events/counters. With this assumption, 
+standard perf configures each core to count events and then totals them at the 
+end. This does not work for SOC events for many reasons, including that it
+would waste counters configuring to collect event counts on each core, and it 
+would effectively multiply the actual event counts by the number of cores.
+
+Due to these complications, qoriq-perf currently has limited use in the
+non-system wide mode (that is, when not using the "-a" option with "stat").
+Results obtained when collecting events in the non-system wide mode should not
+be relied upon at this time.
+
+Another limitation due to the above mentioned complications, is that the multi-
+plexing that perf normally does when there are not enough hardware counters
+to support the event counts listed on the command line does not always work
+as expected. Therefore, if it can be avoided, limit the number of events to
+count so that multiplexing does not occur. One can tell that multiplexing has
+occurred if there is a percentage given next to a result in the "perf stat"
+output.
+
+Often, if the perf command given requires a number of counters that only barely
+exceeds the hardware counters that are available, re-ordering the events
+specified on the command line will result in a smarter allocation of event
+counters to events such that event multiplexing will not be necessary.
+

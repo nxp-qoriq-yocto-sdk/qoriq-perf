@@ -1,0 +1,117 @@
+#
+# Copyright (C) 2010, 2011, 2012, 2013 Freescale Semiconductor, Inc.
+# All rights reserved.
+#
+# This software may be distributed under the terms of the
+# GNU General Public License ("GPL") as published by the Free Software
+# Foundation, either version 2 of that License or (at your option) any
+# later version.
+#
+# THIS SOFTWARE IS PROVIDED BY Freescale Semiconductor ``AS IS'' AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL Freescale Semiconductor BE LIABLE FOR ANY
+# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+********************************************************************************
+ Kernel Module Build and Installation Notes for qoriq-perf
+********************************************************************************
+
+qoriq-perf can be built either on the target board or on a host Linux machine,
+either within the Yocto environment, or separate from Yocto. This README will 
+describe building on the target device and on the host, not using Yocto.
+Building within Yocto is described in a separate README file.
+
+First, unzip the qoriq-perf archive that is included with this README file.
+
+A pre-requisite for building the qoriq-perf kernel module is access to *the*
+configured Linux source tree that was used to build the kernel running on the
+board.  A separate copy of Linux kernel sources is not sufficient and will
+create a kernel module that will not load.
+
+********************************************************************************
+  Build/Install Method 1: Building on the target board
+********************************************************************************
+
+If access to the Linux source used to build the running kernel is available on 
+the target board, this is the easiest method. Otherwise, one of the other 
+methods may be quicker.
+
+Unzip the qoriq-perf tarball and navigate to the root of the extracted folder. 
+Build the tools using the normal Linux invocation
+
+   ./configure <--with-linux=DIR where DIR is the directory containing the linux
+		  sources used to build the target kernel. The default location is
+		  assumed to be /home/root/linux>
+
+	       <--with-processor=E500| B4860_R1 | B4860_R2  
+		  E500 (the default if nothing is specified) should be used for 
+		  all e500mc or e5500 based processors. >
+	make 
+	make install
+
+See ./configure --help for more options.
+
+At this point the kernel module is built and placed in the appropriate system
+directory. To load the kernel module, execute the following commands:
+
+	lsmod
+	modprobe qoriq-perf
+	lsmod
+
+The first lsmod  is to verify that the module is not already loaded. The
+modprobe command loads the module. The second lsmod is to verify that the 
+module is loaded.
+ 
+
+********************************************************************************
+  Build/Install Method 2: Building on a Linux host machine without Yocto 
+********************************************************************************
+
+If the Linux kernel was not built with the Freescale QorIQ SDK (with Yocto),
+this method should be used to build and install the qoriq-perf kernel module.
+
+Unzip the qoriq-perf tarball and navigate to the root of the extracted folder. 
+Build the tools using the normal Linux invocation
+
+	./configure <-with-linux=DIR if linux root is not in /home/root/linux>
+		    <--with-processor=E500| B4860_R1 | B4860_R2  
+		       E500 (the default if nothing is specified) should be 
+		       used for all e500mc or e5500 based processors. > 
+		  
+
+	make CROSS_COMPILE=<path to gcc for target arch>
+
+
+See ./configure --help for more options.
+
+For example,
+	./configure -with-linux=<home>/QorIQ-SDK-V1.3-20121114-yocto/\
+build_p5020ds_release/tmp/work/p5020ds-fsl-linux/linux-qoriq-sdk-3.0.48-r5/git
+
+	make CROSS_COMPILE=<home>/QorIQ-SDK-V1.2-20120614-yocto/\
+build_p5020ds_release/tmp/sysroots/x86_64-linux/usr/libexec/\
+ppce5500-fsl-linux/gcc/powerpc-fsl-linux/4.6.2/ 
+
+The qoriq-perf.ko file should now be in the qoriq-perf/module subdirectory. 
+This file should be moved to the target device and loaded as other kernel 
+modules are loaded in the target system. For example, using the Freescale
+QorIQ Linux SDK, the following would need to be done:
+	
+	* Copy qoriq-perf.ko to /lib/modules/<linux version>/extra/
+	* Execute the following commands:
+		lsmod
+		modprobe qoriq-perf 
+		lsmod
+
+The first lsmod  is to verify that the module is not already loaded. The
+modprobe command loads the module. The second lsmod is to verify that the 
+module is loaded.
+
+
