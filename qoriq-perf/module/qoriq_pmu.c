@@ -311,10 +311,10 @@ void record_and_restart(struct perf_event *event, u64 val)
 	 */
 	if (record) {
 		struct perf_sample_data data;
-		perf_sample_data_init(&data, 0);
+		perf_sample_data_init(&data, 0, period);
 		data.period = event->hw.last_period;
 
-		if (perf_event_overflow(event, nmi, &data, regs))
+		if (perf_event_overflow(event, &data, regs))
 			qoriq_pmu_stop(event, 0);
 	}
 }

@@ -1173,6 +1173,19 @@ const struct epu_counter epu_counter[] = {
 			.cnt_mask = 0x00800000,
 			.cnt_mux = 56,
 		},
+		/* the following is for an B4860 r2-only issue */
+		{
+			.code = DDR1_R2,
+			.cnt_mask = 0x10000000,
+			.cnt_mux = 56,
+		},
+		/* the following is for an B4860 r2-only issue */
+		{
+			.code = DDR2_R2,
+			.cnt_mask = 0x20000000,
+			.cnt_mux = 56,
+		},
+		
 		/* B4860 only uses 2 of the ddr controllers */
 		/*
 		{

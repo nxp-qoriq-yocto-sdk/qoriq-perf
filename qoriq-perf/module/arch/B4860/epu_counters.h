@@ -320,7 +320,12 @@ enum EPU_COUNTER_EVENTS {
 	DDR4_4,
 	DDR4_5,
 
-
+	/* the following is a work-around for an B4860 R2
+	 * only issue
+	 */
+	DDR1_R2 = EPU_EVENT_BASE_DDR + 0x40,
+	DDR2_R2 = EPU_EVENT_BASE_DDR,
+	
 	NPC_QWRITE = EPU_EVENT_BASE_NPC + 0x0,
 	NPC_TGT_REGION_FULL,
 	NPC_TRBFR_FULL,

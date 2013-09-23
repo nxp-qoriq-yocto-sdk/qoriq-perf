@@ -33,35 +33,53 @@ extern struct dbg_devices dbg_dev;
 /* Table of DDR event mappings */
 const struct ddr_event ddr_event[] = {
 		{
+			/* B4860r2 errata; new */
 			.code = QE_DDR1_READ_CYCLES,
+			.dev_index = 0,
+			.epu_event_code = DDR1_R2,
+		},
+
+		{
+			/* B4860r2 errata; was 
+			 * .code = QE_DDR1_READ_CYCLES,*/
+			.code = QE_DDR1_WRITE_CYCLES,
 			.dev_index = 0,
 			.epu_event_code = DDR1_0,
 		},
 		{
-			.code = QE_DDR1_WRITE_CYCLES,
+			/* B4860r2 errata; was
+			 * .code = QE_DDR1_WRITE_CYCLES, */
+			.code = QE_DDR1_PAGE_CLOSING_NON_REFRESH,
 			.dev_index = 0,
 			.epu_event_code = DDR1_1,
 		},
 		{
-			.code = QE_DDR1_PAGE_CLOSING_NON_REFRESH,
+			/* B4860r2 errata; was 
+			.code = QE_DDR1_PAGE_CLOSING_NON_REFRESH, */
+			.code = QE_DDR1_PAGE_CLOSING,
 			.dev_index = 0,
 			.epu_event_code = DDR1_2,
 		},
 		{
-			.code = QE_DDR1_PAGE_CLOSING,
+			/* B4860r2 errata; was
+			.code = QE_DDR1_PAGE_CLOSING, */
+			.code = QE_DDR1_PAGE_CLOSING_COLLISION,
 			.dev_index = 0,
 			.epu_event_code = DDR1_3,
 		},
 		{
-			.code = QE_DDR1_PAGE_CLOSING_COLLISION,
+			/* B4860r2 errata; was
+			.code = QE_DDR1_PAGE_CLOSING_COLLISION, */
+			.code = QE_DDR1_DIVIDE_BY_4_DDRC_CLOCK_PULSE,
 			.dev_index = 0,
 			.epu_event_code = DDR1_4,
 		},
-		{
+/* B4860r2 errata; was
+ * 		{
 			.code = QE_DDR1_DIVIDE_BY_4_DDRC_CLOCK_PULSE,
 			.dev_index = 0,
 			.epu_event_code = DDR1_5,
-		},
+		}, */
 /*		{
 			.code = QE_DDR1_MISC_PERFMON,
 			.dev_index = 0,
@@ -75,36 +93,52 @@ const struct ddr_event ddr_event[] = {
 */		
 	
 		{
-			.code = QE_DDR2_READ_CYCLES,
+			/* B4860r2 errata; was 
+			.code = QE_DDR2_READ_CYCLES, */
+			.code = QE_DDR2_WRITE_CYCLES,
+
 			.dev_index = 1,
 			.epu_event_code = DDR2_0,
 		},
 		{
-			.code = QE_DDR2_WRITE_CYCLES,
+			/* B4860r2 errata; was 
+			.code = QE_DDR2_WRITE_CYCLES, */
+			.code = QE_DDR2_PAGE_CLOSING_NON_REFRESH,
+
 			.dev_index = 1,
 			.epu_event_code = DDR2_1,
 		},
 		{
-			.code = QE_DDR2_PAGE_CLOSING_NON_REFRESH,
+			/* B4860r2 errata; was 
+			.code = QE_DDR2_PAGE_CLOSING_NON_REFRESH, */
+			.code = QE_DDR2_PAGE_CLOSING,
+
 			.dev_index = 1,
 			.epu_event_code = DDR2_2,
 		},
 		{
-			.code = QE_DDR2_PAGE_CLOSING,
+			/* B4860r2 errata; was 
+			.code = QE_DDR2_PAGE_CLOSING, */
+			.code = QE_DDR2_PAGE_CLOSING_COLLISION,
+			
 			.dev_index = 1,
 			.epu_event_code = DDR2_3,
 		},
 		{
-			.code = QE_DDR2_PAGE_CLOSING_COLLISION,
+			/* B4860r2 errata; was 
+			.code = QE_DDR2_PAGE_CLOSING_COLLISION, */
+			.code = QE_DDR2_DIVIDE_BY_4_DDRC_CLOCK_PULSE,
 			.dev_index = 1,
 			.epu_event_code = DDR2_4,
 		},
 
+		/* B4860r2 errata; was
 		{
 			.code = QE_DDR2_DIVIDE_BY_4_DDRC_CLOCK_PULSE,
 			.dev_index = 1,
 			.epu_event_code = DDR2_5,
 		},
+		*/
 /*		{
 			.code = QE_DDR2_MISC_PERFMON,
 			.dev_index = 1,
@@ -237,6 +271,6 @@ NOINLINE void qoriq_ddr_enable_events(u32 ddr_cntlr_ind, int enable)
     	out_be32(DDR_REG_PTR(ddr_cntlr_ind, ddicr0), disable_val);
     	debug19_val &= ~DDR_C_DBG19_PRF_EN_OVRD_MASK;
     }
-
+    
 	out_be32(DDR_C_REG_PTR(debug_19), debug19_val);
 }
